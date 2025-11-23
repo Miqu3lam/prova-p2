@@ -1,0 +1,64 @@
+version: "3.9"
+
+services:
+
+  mongo:
+    image: mongo:6
+    container_name: transflow_mongo
+    ports:
+      - "27017:27017"
+
+  redis:
+    image: redis:7.2
+    container_name: transflow_redis
+    ports:
+      - "6379:6379"
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: transflow_rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: transflow_consumer
+    command: ["faststream", "run", "src.consumer:app"]
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+      redis:
+        condition: service_started
+    environment:
+      RABBITMQ_URL: "amqp://guest:guest@rabbitmq:5672/"
+      MONGO_URL: "mongodb://mongo:27017"
+      REDIS_URL: "redis://redis:6379"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: transflow_app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongo:
+        condition: service_started
+      redis:
+        condition: service_started
+    environment:
+      MONGO_URL: "mongodb://mongo:27017"
+      REDIS_URL: "redis://redis:6379"

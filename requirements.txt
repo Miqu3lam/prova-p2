@@ -1,0 +1,8 @@
+motor
+fastapi
+pydantic
+uvicorn
+redis
+faststream[cli]
+faststream[rabbit]
+
