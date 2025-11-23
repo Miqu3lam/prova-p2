@@ -32,7 +32,7 @@ Git
 
 
 📥 Clonando o repositório
-git clone https://github.com/seu-usuario/transflow.git
+git clone https://github.com/Miqu3lam/prova-p2
 cd transflow
 
 ▶️ Subindo a aplicação
