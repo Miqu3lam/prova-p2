@@ -33,7 +33,8 @@ Git
 
 📥 Clonando o repositório
 git clone https://github.com/Miqu3lam/prova-p2
-cd transflow
+
+cd transflow_fixed
 
 ▶️ Subindo a aplicação
 
